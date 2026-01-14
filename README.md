@@ -1,2 +1,8 @@
-# sahabat-umkm-community-website
-Exported from Caffeine project: Sahabat UMKM Community Website
+## Sahabat UMKM Community Website
+
+To run app build and run docker image:
+
+```
+docker build -t app .
+docker run -it --network host app
+```

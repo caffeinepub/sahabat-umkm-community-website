@@ -1,0 +1,16 @@
+{
+  "frontend/src/App.tsx": "Main application component managing navigation between sections with profile setup modal, admin login modal triggered by Ctrl+Shift+A keyboard shortcut, and admin status tracking.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profiles, member registration, events, articles, photos, and admin session management with proper caching and invalidation.",
+  "frontend/src/components/Header.tsx": "Responsive navigation header with logo, menu items, authentication button, admin badge display when user has admin privileges, and mobile menu support.",
+  "frontend/src/components/Hero.tsx": "Hero section with aerial beach background image, soft blue overlay for text readability, logo display, welcome message, call-to-action buttons, quick stats cards, and featured content grid.",
+  "frontend/src/components/About.tsx": "About page displaying mission, vision, values, image gallery, and contact information for Sahabat UMKM.",
+  "frontend/src/components/Events.tsx": "Events page with tabs for upcoming and past events, displaying event cards with date, location, and description.",
+  "frontend/src/components/News.tsx": "News and articles page with grid layout, article cards, and modal dialog for reading full article content.",
+  "frontend/src/components/Gallery.tsx": "Photo gallery with category filtering tabs, grid layout, and lightbox modal for viewing full-size images.",
+  "frontend/src/components/Members.tsx": "Members directory with search functionality, displaying member business profiles with contact information and products.",
+  "frontend/src/components/Registration.tsx": "Registration form for new members to join the community with validation and success feedback.",
+  "frontend/src/components/Footer.tsx": "Footer with logo, social media links, quick navigation, contact information, and attribution.",
+  "frontend/src/components/ProfileSetupModal.tsx": "Modal dialog for first-time users to set up their profile with name, email, and phone number.",
+  "frontend/src/index.css": "Global styles with OKLCH color system featuring soft blue background tones (gentle, not overly bright) for light and dark modes, while preserving UMKM brand accent colors (blue, orange, red) for buttons and highlights.",
+  "frontend/src/components/AdminLoginModal.tsx": "Modal dialog for admin authentication that appears when Ctrl+Shift+A is pressed, prompting users to login with Internet Identity and activate admin session."
+}
