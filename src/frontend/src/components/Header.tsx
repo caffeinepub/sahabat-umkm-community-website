@@ -39,6 +39,8 @@ export default function Header({ activeSection, onNavigate, isAdmin = false }: H
               src="/assets/logo flat SU BPC Karawang png.png"
               alt="Sahabat UMKM BPC Karawang"
               className="h-12 w-auto md:h-14 object-contain"
+              loading="eager"
+              fetchPriority="high"
             />
           </button>
 

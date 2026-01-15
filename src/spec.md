@@ -16,6 +16,15 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Header and footer background colors adjusted if necessary to ensure logo visibility and contrast
 - Logo preserves its original aspect ratio and branding elements (blue text, colorful arrow design)
 
+## Performance Optimization
+- **Static Asset Compression**: All images, CSS, and JavaScript files are compressed before deployment to reduce bundle size
+- **Image Optimization**: Automatic image compression and format optimization (WebP where supported) for faster loading
+- **Caching Strategy**: Implement browser caching headers for static assets with appropriate cache durations
+- **Build Optimization**: Minification of CSS and JavaScript files during build process
+- **Asset Bundling**: Efficient bundling and code splitting to reduce initial load times
+- **Lazy Loading**: Images and non-critical components load on demand to improve initial page performance
+- **CDN-Ready**: Static assets optimized for content delivery network distribution
+
 ## Core Features
 
 ### Admin Panel
@@ -275,6 +284,7 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Product submissions (`produkPengajuan`) with images, categories, business names, and contact information stored temporarily
 - Registration applications
 - Admin credentials and authentication data
+- **Optimized asset storage**: Compressed images and static assets with efficient storage formats
 
 ## Backend Operations
 - Create and manage member profiles with verification status tracking and member ID number storage
@@ -307,3 +317,5 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Retrieve and serve published member products for homepage display
 - Validate and process product image uploads with aspect ratio and size constraints for both admin and public submissions
 - **Backend health monitoring**: Provide reliable endpoint responses for frontend connection validation and retry logic
+- **Asset optimization**: Serve compressed static assets with appropriate caching headers for improved performance
+- **Deployment optimization**: Implement efficient asset bundling and compression for faster deployment cycles

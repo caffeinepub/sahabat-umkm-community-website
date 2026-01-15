@@ -65,6 +65,8 @@ export default function Gallery() {
                           src={photo.url}
                           alt={photo.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
                           <div className="p-4 text-white w-full">
@@ -88,6 +90,7 @@ export default function Gallery() {
                 src={selectedPhoto}
                 alt="Photo"
                 className="w-full h-auto max-h-[90vh] object-contain"
+                loading="eager"
               />
             )}
           </DialogContent>
@@ -100,26 +103,36 @@ export default function Gallery() {
               src="/assets/generated/umkm-meeting.dim_800x600.jpg"
               alt="UMKM Meeting"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
+              loading="lazy"
+              decoding="async"
             />
             <img
               src="/assets/generated/umkm-storefront.dim_800x600.jpg"
               alt="UMKM Storefront"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
+              loading="lazy"
+              decoding="async"
             />
             <img
               src="/assets/generated/entrepreneurs-group.dim_800x600.jpg"
               alt="Entrepreneurs Group"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
+              loading="lazy"
+              decoding="async"
             />
             <img
               src="/assets/generated/workspace.dim_800x600.jpg"
               alt="Workspace"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
+              loading="lazy"
+              decoding="async"
             />
             <img
               src="/assets/generated/marketplace.dim_800x600.jpg"
               alt="Marketplace"
               className="w-full h-64 object-cover rounded-lg shadow-lg"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         )}

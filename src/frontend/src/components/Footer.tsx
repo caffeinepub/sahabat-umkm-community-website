@@ -16,6 +16,8 @@ export default function Footer({ onNavigate }: FooterProps) {
               src="/assets/logo flat SU BPC Karawang png.png"
               alt="Sahabat UMKM BPC Karawang"
               className="h-16 md:h-20 w-auto mb-4 object-contain"
+              loading="lazy"
+              decoding="async"
             />
             <p className="text-muted-foreground mb-4">
               Bersama membangun dan mengembangkan UMKM Indonesia menuju masa depan yang lebih cerah.

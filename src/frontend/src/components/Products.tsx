@@ -289,6 +289,8 @@ export default function Products() {
                       src={product.foto}
                       alt={product.namaUsaha}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 )}
@@ -363,6 +365,7 @@ export default function Products() {
                         src={imagePreview}
                         alt="Preview"
                         className="w-full h-full object-cover"
+                        loading="eager"
                       />
                       <Button
                         size="icon"
@@ -475,6 +478,7 @@ export default function Products() {
                         src={imagePreview}
                         alt="Preview"
                         className="w-full h-full object-cover"
+                        loading="eager"
                       />
                       <Button
                         size="icon"

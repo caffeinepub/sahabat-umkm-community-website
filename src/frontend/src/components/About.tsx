@@ -81,16 +81,22 @@ export default function About() {
             src="/assets/generated/umkm-storefront.dim_800x600.jpg"
             alt="UMKM Storefront"
             className="w-full h-64 object-cover rounded-lg shadow-lg"
+            loading="lazy"
+            decoding="async"
           />
           <img
             src="/assets/generated/workspace.dim_800x600.jpg"
             alt="Workspace"
             className="w-full h-64 object-cover rounded-lg shadow-lg"
+            loading="lazy"
+            decoding="async"
           />
           <img
             src="/assets/generated/marketplace.dim_800x600.jpg"
             alt="Marketplace"
             className="w-full h-64 object-cover rounded-lg shadow-lg"
+            loading="lazy"
+            decoding="async"
           />
         </div>
 

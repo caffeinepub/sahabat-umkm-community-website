@@ -21,6 +21,8 @@ export default function Hero({ onNavigate }: HeroProps) {
               src="/assets/dynamic-data-visualization-3d.jpg"
               alt="Hero Background"
               className="w-full h-full object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
             />
             <div className="absolute inset-0 bg-umkm-blue/70" />
           </div>
@@ -32,6 +34,8 @@ export default function Hero({ onNavigate }: HeroProps) {
                   src="/assets/logo su putih.png"
                   alt="Sahabat UMKM"
                   className="h-24 w-auto mb-6"
+                  loading="eager"
+                  fetchPriority="high"
                 />
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
@@ -120,6 +124,8 @@ export default function Hero({ onNavigate }: HeroProps) {
                         src={product.foto}
                         alt={product.namaUsaha}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   ) : (
