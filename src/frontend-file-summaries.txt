@@ -23,5 +23,5 @@
   "frontend/src/lib/whatsapp.ts": "Utility functions for normalizing phone numbers and creating WhatsApp links, handling Indonesian local and international formats.",
   "frontend/src/components/WhatsAppLink.tsx": "Reusable component that renders clickable WhatsApp links with icon and \"Mulai Chat\" text, styled with blue accent color and hover effects.",
   "frontend/src/components/EducationCategoryMenu.tsx": "Education category selection menu displaying seven categories (Marketing, Branding, Selling, Manajemen Produksi, Desain, Manajemen Keuangan, Lain-lain) with icons and descriptions, allowing admins to navigate to filtered education content management views.",
-  "frontend/src/components/EducationManagement.tsx": "Admin interface for managing educational content filtered by category, with add, edit, and delete functionality, category-based filtering using title prefixes, and back navigation to category menu."
+  "frontend/src/components/EducationManagement.tsx": "Admin interface for managing educational content with category-based filtering, featuring a specialized form for Marketing category with PDF upload validation (base64 encoding) and numbered list display ordered by date, while other categories maintain the standard grid layout with image and text content."
 }

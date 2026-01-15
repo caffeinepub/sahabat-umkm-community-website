@@ -1,4 +1,4 @@
-import { Calendar, User, ArrowRight, GraduationCap, Plus, Edit, Trash2, Loader2, ArrowLeft } from 'lucide-react';
+import { Calendar, User, ArrowRight, GraduationCap, Plus, Edit, Trash2, Loader2, ArrowLeft, FileText } from 'lucide-react';
 import { useGetAllEdukasi, useAddEdukasi, useEditEdukasi, useDeleteEdukasi } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ export default function EducationManagement({ category, onBack }: EducationManag
   const [selectedEdukasi, setSelectedEdukasi] = useState<Edukasi | null>(null);
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [editingEdukasi, setEditingEdukasi] = useState<Edukasi | null>(null);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -39,12 +40,14 @@ export default function EducationManagement({ category, onBack }: EducationManag
   const filteredEdukasi = category === 'all' 
     ? edukasiList 
     : edukasiList.filter((item) => {
-        // Extract category from title or content (temporary solution until backend supports category field)
         const itemCategory = item.title.includes('[') 
           ? item.title.match(/\[(.*?)\]/)?.[1] || 'Lain-lain'
           : 'Lain-lain';
         return itemCategory === category;
       });
+
+  // Sort by date (newest first)
+  const sortedEdukasi = [...filteredEdukasi].sort((a, b) => Number(b.date - a.date));
 
   const formatDate = (timestamp: bigint) => {
     const date = new Date(Number(timestamp) / 1000000);
@@ -58,7 +61,6 @@ export default function EducationManagement({ category, onBack }: EducationManag
   const handleOpenManageDialog = (edukasi?: Edukasi) => {
     if (edukasi) {
       setEditingEdukasi(edukasi);
-      // Extract category from title
       const itemCategory = edukasi.title.includes('[') 
         ? edukasi.title.match(/\[(.*?)\]/)?.[1] || 'Lain-lain'
         : 'Lain-lain';
@@ -95,15 +97,70 @@ export default function EducationManagement({ category, onBack }: EducationManag
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (!formData.title.trim() || !formData.content.trim() || !formData.author.trim()) {
-      toast.error('Mohon lengkapi semua field yang wajib diisi');
+    // Validate PDF file type
+    if (file.type !== 'application/pdf') {
+      toast.error('File harus berformat PDF');
+      e.target.value = '';
       return;
     }
 
-    // Add category prefix to title
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 10MB');
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      setUploadingPdf(true);
+      
+      // Convert PDF to base64
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Pdf = event.target?.result as string;
+        setFormData({ ...formData, image: base64Pdf });
+        toast.success('PDF berhasil diupload');
+        setUploadingPdf(false);
+      };
+      
+      reader.onerror = () => {
+        toast.error('Gagal membaca file PDF');
+        setUploadingPdf(false);
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (error: any) {
+      console.error('PDF upload error:', error);
+      toast.error('Gagal mengupload PDF');
+      setUploadingPdf(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation for Marketing category
+    if (formData.category === 'Marketing') {
+      if (!formData.title.trim() || !formData.author.trim()) {
+        toast.error('Mohon lengkapi semua field yang wajib diisi');
+        return;
+      }
+      if (!formData.image) {
+        toast.error('Mohon upload file PDF materi');
+        return;
+      }
+    } else {
+      // Validation for other categories
+      if (!formData.title.trim() || !formData.content.trim() || !formData.author.trim()) {
+        toast.error('Mohon lengkapi semua field yang wajib diisi');
+        return;
+      }
+    }
+
     const titleWithCategory = `[${formData.category}] ${formData.title}`;
 
     try {
@@ -111,7 +168,7 @@ export default function EducationManagement({ category, onBack }: EducationManag
         await editMutation.mutateAsync({
           id: editingEdukasi.id,
           title: titleWithCategory,
-          content: formData.content,
+          content: formData.content || 'PDF Material',
           author: formData.author,
           image: formData.image || null,
         });
@@ -119,7 +176,7 @@ export default function EducationManagement({ category, onBack }: EducationManag
       } else {
         await addMutation.mutateAsync({
           title: titleWithCategory,
-          content: formData.content,
+          content: formData.content || 'PDF Material',
           author: formData.author,
           image: formData.image || null,
         });
@@ -151,6 +208,8 @@ export default function EducationManagement({ category, onBack }: EducationManag
     if (category === 'all') return 'Semua Kategori';
     return category;
   };
+
+  const isMarketingCategory = formData.category === 'Marketing';
 
   return (
     <section className="py-16 bg-background">
@@ -187,13 +246,13 @@ export default function EducationManagement({ category, onBack }: EducationManag
           </div>
         </div>
 
-        {/* Education Content Grid */}
+        {/* Education Content Display */}
         {isLoading ? (
           <div className="text-center py-12">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-umkm-blue mb-4" />
             <p className="text-muted-foreground">Memuat konten edukasi...</p>
           </div>
-        ) : filteredEdukasi.length === 0 ? (
+        ) : sortedEdukasi.length === 0 ? (
           <div className="text-center py-12">
             <GraduationCap className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
             <p className="text-xl text-muted-foreground">
@@ -207,9 +266,78 @@ export default function EducationManagement({ category, onBack }: EducationManag
               Tambah Konten Pertama
             </Button>
           </div>
+        ) : category === 'Marketing' ? (
+          // Numbered list view for Marketing category
+          <div className="bg-card rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-6 text-foreground">Daftar Materi Marketing</h2>
+            <div className="space-y-4">
+              {sortedEdukasi.map((edukasi, index) => {
+                const titleWithoutCategory = edukasi.title.replace(/\[.*?\]\s*/, '');
+                return (
+                  <div
+                    key={Number(edukasi.id)}
+                    className="flex items-start gap-4 p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 bg-umkm-blue text-white rounded-full flex items-center justify-center font-bold">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-foreground mb-1">
+                        {titleWithoutCategory}
+                      </h3>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                        <span className="flex items-center">
+                          <User className="h-4 w-4 mr-1" />
+                          {edukasi.author}
+                        </span>
+                        <span className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {formatDate(edukasi.date)}
+                        </span>
+                      </div>
+                      {edukasi.image && (
+                        <a
+                          href={edukasi.image}
+                          download={`${titleWithoutCategory}.pdf`}
+                          className="inline-flex items-center text-umkm-blue hover:text-umkm-blue/80 text-sm font-medium"
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          Download Materi PDF
+                        </a>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenManageDialog(edukasi)}
+                        className="text-umkm-blue hover:text-umkm-blue/80"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(edukasi.id)}
+                        disabled={deleteMutation.isPending}
+                        className="text-destructive hover:text-destructive/80"
+                      >
+                        {deleteMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         ) : (
+          // Grid view for other categories
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEdukasi.map((edukasi) => {
+            {sortedEdukasi.map((edukasi) => {
               const titleWithoutCategory = edukasi.title.replace(/\[.*?\]\s*/, '');
               return (
                 <Card key={Number(edukasi.id)} className="hover:shadow-lg transition-shadow flex flex-col">
@@ -331,6 +459,7 @@ export default function EducationManagement({ category, onBack }: EducationManag
                 <Select
                   value={formData.category}
                   onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  disabled={isMarketingCategory && category === 'Marketing'}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih kategori" />
@@ -346,16 +475,20 @@ export default function EducationManagement({ category, onBack }: EducationManag
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
-                <Label htmlFor="title">Judul *</Label>
+                <Label htmlFor="title">
+                  {isMarketingCategory ? 'Judul Materi *' : 'Judul *'}
+                </Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Masukkan judul konten edukasi"
+                  placeholder={isMarketingCategory ? 'Masukkan judul materi' : 'Masukkan judul konten edukasi'}
                   required
                 />
               </div>
+
               <div>
                 <Label htmlFor="author">Penulis *</Label>
                 <Input
@@ -366,45 +499,80 @@ export default function EducationManagement({ category, onBack }: EducationManag
                   required
                 />
               </div>
-              <div>
-                <Label htmlFor="image">URL Gambar (Opsional)</Label>
-                <Input
-                  id="image"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                  type="url"
-                />
-              </div>
-              <div>
-                <Label htmlFor="content">Konten *</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  placeholder="Tulis konten edukasi di sini..."
-                  rows={10}
-                  required
-                />
-              </div>
+
+              {isMarketingCategory ? (
+                // PDF upload for Marketing category
+                <div>
+                  <Label htmlFor="pdf">Upload Materi (PDF) *</Label>
+                  <Input
+                    id="pdf"
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handlePdfUpload}
+                    disabled={uploadingPdf}
+                    className="cursor-pointer"
+                  />
+                  {uploadingPdf && (
+                    <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Mengupload PDF...</span>
+                    </div>
+                  )}
+                  {formData.image && !uploadingPdf && (
+                    <div className="flex items-center gap-2 mt-2 text-sm text-umkm-blue">
+                      <FileText className="h-4 w-4" />
+                      <span>PDF berhasil diupload</span>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Format: PDF, Maksimal 10MB
+                  </p>
+                </div>
+              ) : (
+                // Image and content fields for other categories
+                <>
+                  <div>
+                    <Label htmlFor="image">URL Gambar (Opsional)</Label>
+                    <Input
+                      id="image"
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                      type="url"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="content">Konten *</Label>
+                    <Textarea
+                      id="content"
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      placeholder="Tulis konten edukasi di sini..."
+                      rows={10}
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
               <DialogFooter>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleCloseManageDialog}
-                  disabled={addMutation.isPending || editMutation.isPending}
+                  disabled={addMutation.isPending || editMutation.isPending || uploadingPdf}
                 >
                   Batal
                 </Button>
                 <Button
                   type="submit"
-                  disabled={addMutation.isPending || editMutation.isPending}
+                  disabled={addMutation.isPending || editMutation.isPending || uploadingPdf}
                   className="bg-umkm-blue hover:bg-umkm-blue/90"
                 >
                   {(addMutation.isPending || editMutation.isPending) && (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   )}
-                  {editingEdukasi ? 'Perbarui' : 'Tambah'}
+                  {editingEdukasi ? 'Perbarui' : 'Publikasikan'}
                 </Button>
               </DialogFooter>
             </form>

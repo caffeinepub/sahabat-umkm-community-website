@@ -10,11 +10,13 @@ import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Char "mo:core/Char";
 import Runtime "mo:core/Runtime";
+import Migration "migration";
 
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 
+(with migration = Migration.run)
 actor {
   // Types
   type MemberId = Nat;
@@ -775,4 +777,3 @@ actor {
     edukasiContent.values().toArray().sort(Edukasi.compareByDate);
   };
 };
-

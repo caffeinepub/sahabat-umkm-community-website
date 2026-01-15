@@ -213,10 +213,25 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Responsive layout that adapts to different screen sizes
 - Category buttons maintain consistent styling with other admin interface elements
 - Filtered views display only educational content matching the selected category
-- Educational content management interface with options to add, edit, and delete educational materials
-- Content creation and editing forms include category selection dropdown matching the seven categories
-- All educational content is tagged with appropriate categories for proper filtering
-- Styled consistently with soft blue theme and other admin management pages
+
+#### Marketing Category Content Management
+- **Specialized form for Marketing category** with simplified fields:
+  - **Kategori**: Fixed to "Marketing" (read-only field)
+  - **Judul Materi**: Required text input field for material title
+  - **Penulis**: Required text input field for author name
+  - **Upload Materi (PDF)**: File upload field with strict PDF validation
+- **PDF file validation**:
+  - Only accepts PDF file format (.pdf extension)
+  - Clear error message in Indonesian when non-PDF files are uploaded: "File harus berformat PDF"
+  - File size validation and appropriate error handling
+- **Content display for Marketing category**:
+  - Published content displayed as numbered list with automatic sequential numbering (1, 2, 3, etc.)
+  - Content ordered by input date (newest first or oldest first based on admin preference)
+  - Each entry shows: number, title, author, and download link for PDF material
+- Form submission creates new educational content entry in backend with Marketing category
+- "Publikasikan" (Publish) button saves content and adds to Marketing category list
+- Form styling consistent with soft blue theme and responsive design
+- All other categories maintain existing educational content management functionality
 
 ### Registration/Join Us Page
 - Membership application form with soft blue styling
@@ -279,6 +294,7 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Member profiles and business information with verification status and member ID numbers
 - News articles and content
 - Educational articles and materials with titles, content, categories, and optional images
+- **Marketing educational content**: Specialized storage for Marketing category content with fields for title, author, PDF file, and input date
 - Photo gallery images and metadata
 - Member products with images, categories, business names, and contact information
 - Product submissions (`produkPengajuan`) with images, categories, business names, and contact information stored temporarily
@@ -291,6 +307,9 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Update member ID numbers manually through admin interface
 - Publish and manage news articles
 - Create, edit, and delete educational content items with category assignment and filtering
+- **Marketing content operations**: Create Marketing educational content with title, author, and PDF file upload
+- **PDF file handling**: Validate and store PDF files for Marketing educational materials
+- **Date-ordered content retrieval**: Retrieve Marketing educational content ordered by input date for numbered list display
 - Retrieve educational content filtered by specific categories (Marketing, Branding, Selling, Manajemen Produksi, Desain, Manajemen Keuangan, Lain-lain)
 - Create, edit, and delete member products with image upload and validation
 - Handle membership registration submissions
