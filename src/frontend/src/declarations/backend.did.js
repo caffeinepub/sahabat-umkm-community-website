@@ -20,8 +20,11 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
 export const ArticleId = IDL.Nat;
+export const EdukasiId = IDL.Nat;
 export const EventId = IDL.Nat;
+export const PengajuanProdukId = IDL.Nat;
 export const PhotoId = IDL.Nat;
+export const ProdukId = IDL.Nat;
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -35,7 +38,16 @@ export const Article = IDL.Record({
   'date' : IDL.Nat,
   'author' : IDL.Text,
 });
+export const Edukasi = IDL.Record({
+  'id' : EdukasiId,
+  'title' : IDL.Text,
+  'content' : IDL.Text,
+  'date' : IDL.Nat,
+  'author' : IDL.Text,
+  'image' : IDL.Opt(IDL.Text),
+});
 export const MemberId = IDL.Nat;
+export const MemberIdNumber = IDL.Text;
 export const MemberProfile = IDL.Record({
   'id' : MemberId,
   'verified' : IDL.Bool,
@@ -48,6 +60,14 @@ export const MemberProfile = IDL.Record({
   'address' : IDL.Text,
   'category' : IDL.Text,
   'products' : IDL.Vec(IDL.Text),
+  'memberIdNumber' : IDL.Opt(MemberIdNumber),
+});
+export const PengajuanProduk = IDL.Record({
+  'id' : PengajuanProdukId,
+  'namaUsaha' : IDL.Text,
+  'foto' : IDL.Opt(IDL.Text),
+  'kategori' : IDL.Text,
+  'hubungiSelanjutnya' : IDL.Opt(IDL.Text),
 });
 export const Photo = IDL.Record({
   'id' : PhotoId,
@@ -55,6 +75,13 @@ export const Photo = IDL.Record({
   'title' : IDL.Text,
   'category' : IDL.Text,
   'uploadDate' : IDL.Nat,
+});
+export const ProdukAnggota = IDL.Record({
+  'id' : ProdukId,
+  'namaUsaha' : IDL.Text,
+  'foto' : IDL.Opt(IDL.Text),
+  'kategori' : IDL.Text,
+  'hubungiSelanjutnya' : IDL.Opt(IDL.Text),
 });
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
@@ -99,20 +126,57 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addArticle' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [ArticleId], []),
+  'addEdukasi' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+      [EdukasiId],
+      [],
+    ),
   'addEvent' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Bool],
       [EventId],
       [],
     ),
+  'addPengajuanProduk' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+      [PengajuanProdukId],
+      [],
+    ),
   'addPhoto' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [PhotoId], []),
+  'addProdukAnggota' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+      [ProdukId],
+      [],
+    ),
+  'approvePengajuanProduk' : IDL.Func([PengajuanProdukId], [ProdukId], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'deleteEdukasi' : IDL.Func([EdukasiId], [], []),
+  'deleteProdukAnggota' : IDL.Func([ProdukId], [], []),
+  'editEdukasi' : IDL.Func(
+      [EdukasiId, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+      [],
+      [],
+    ),
+  'editProdukAnggota' : IDL.Func(
+      [ProdukId, IDL.Opt(IDL.Text), IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+      [],
+      [],
+    ),
   'endAdminSession' : IDL.Func([AdminSessionId], [], []),
   'getAllArticles' : IDL.Func([], [IDL.Vec(Article)], ['query']),
+  'getAllEdukasi' : IDL.Func([], [IDL.Vec(Edukasi)], ['query']),
   'getAllMemberProfiles' : IDL.Func([], [IDL.Vec(MemberProfile)], ['query']),
+  'getAllPengajuanProduk' : IDL.Func([], [IDL.Vec(PengajuanProduk)], ['query']),
   'getAllPhotos' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
+  'getAllProdukAnggota' : IDL.Func([], [IDL.Vec(ProdukAnggota)], ['query']),
+  'getAnggotaListByCategorySorted' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(MemberProfile)],
+      ['query'],
+    ),
   'getArticlesByDate' : IDL.Func([], [IDL.Vec(Article)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getEdukasiByDate' : IDL.Func([], [IDL.Vec(Edukasi)], ['query']),
   'getEventsByDate' : IDL.Func([], [IDL.Vec(Event)], ['query']),
   'getEventsByLocation' : IDL.Func([IDL.Text], [IDL.Vec(Event)], ['query']),
   'getMemberProfilesByBusinessName' : IDL.Func(
@@ -130,9 +194,41 @@ export const idlService = IDL.Service({
       [IDL.Vec(MemberProfile)],
       ['query'],
     ),
+  'getMembersForAdmin' : IDL.Func([], [IDL.Vec(MemberProfile)], ['query']),
   'getPastEvents' : IDL.Func([], [IDL.Vec(Event)], ['query']),
+  'getPengajuanByKategori' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(PengajuanProduk)],
+      ['query'],
+    ),
+  'getPengajuanByKategoriSorted' : IDL.Func(
+      [],
+      [IDL.Vec(PengajuanProduk)],
+      ['query'],
+    ),
+  'getPengajuanByNamaUsahaSorted' : IDL.Func(
+      [],
+      [IDL.Vec(PengajuanProduk)],
+      ['query'],
+    ),
   'getPhotosByCategory' : IDL.Func([IDL.Text], [IDL.Vec(Photo)], ['query']),
   'getPhotosByUploadDate' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
+  'getProdukByKategori' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(ProdukAnggota)],
+      ['query'],
+    ),
+  'getProdukByKategoriSorted' : IDL.Func(
+      [],
+      [IDL.Vec(ProdukAnggota)],
+      ['query'],
+    ),
+  'getProdukByNamaUsahaSorted' : IDL.Func(
+      [],
+      [IDL.Vec(ProdukAnggota)],
+      ['query'],
+    ),
+  'getSortedAnggotaList' : IDL.Func([], [IDL.Vec(MemberProfile)], ['query']),
   'getUpcomingEvents' : IDL.Func([], [IDL.Vec(Event)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -154,14 +250,18 @@ export const idlService = IDL.Service({
       [MemberId],
       [],
     ),
+  'rejectPengajuanProduk' : IDL.Func([PengajuanProdukId], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'searchAnggota' : IDL.Func([IDL.Text], [IDL.Vec(MemberProfile)], ['query']),
   'searchMemberProfilesByBusinessName' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(MemberProfile)],
       ['query'],
     ),
-  'startAdminSession' : IDL.Func([], [AdminSessionId], []),
+  'startAdminSession' : IDL.Func([IDL.Text, IDL.Text], [AdminSessionId], []),
+  'updateMemberIdNumber' : IDL.Func([MemberId, IDL.Text], [], []),
   'validateAdminSession' : IDL.Func([AdminSessionId], [IDL.Bool], ['query']),
+  'verifyMember' : IDL.Func([MemberId, IDL.Bool], [], []),
 });
 
 export const idlInitArgs = [];
@@ -179,8 +279,11 @@ export const idlFactory = ({ IDL }) => {
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
   const ArticleId = IDL.Nat;
+  const EdukasiId = IDL.Nat;
   const EventId = IDL.Nat;
+  const PengajuanProdukId = IDL.Nat;
   const PhotoId = IDL.Nat;
+  const ProdukId = IDL.Nat;
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -194,7 +297,16 @@ export const idlFactory = ({ IDL }) => {
     'date' : IDL.Nat,
     'author' : IDL.Text,
   });
+  const Edukasi = IDL.Record({
+    'id' : EdukasiId,
+    'title' : IDL.Text,
+    'content' : IDL.Text,
+    'date' : IDL.Nat,
+    'author' : IDL.Text,
+    'image' : IDL.Opt(IDL.Text),
+  });
   const MemberId = IDL.Nat;
+  const MemberIdNumber = IDL.Text;
   const MemberProfile = IDL.Record({
     'id' : MemberId,
     'verified' : IDL.Bool,
@@ -207,6 +319,14 @@ export const idlFactory = ({ IDL }) => {
     'address' : IDL.Text,
     'category' : IDL.Text,
     'products' : IDL.Vec(IDL.Text),
+    'memberIdNumber' : IDL.Opt(MemberIdNumber),
+  });
+  const PengajuanProduk = IDL.Record({
+    'id' : PengajuanProdukId,
+    'namaUsaha' : IDL.Text,
+    'foto' : IDL.Opt(IDL.Text),
+    'kategori' : IDL.Text,
+    'hubungiSelanjutnya' : IDL.Opt(IDL.Text),
   });
   const Photo = IDL.Record({
     'id' : PhotoId,
@@ -214,6 +334,13 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'category' : IDL.Text,
     'uploadDate' : IDL.Nat,
+  });
+  const ProdukAnggota = IDL.Record({
+    'id' : ProdukId,
+    'namaUsaha' : IDL.Text,
+    'foto' : IDL.Opt(IDL.Text),
+    'kategori' : IDL.Text,
+    'hubungiSelanjutnya' : IDL.Opt(IDL.Text),
   });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
@@ -258,20 +385,61 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addArticle' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [ArticleId], []),
+    'addEdukasi' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [EdukasiId],
+        [],
+      ),
     'addEvent' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Bool],
         [EventId],
         [],
       ),
+    'addPengajuanProduk' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [PengajuanProdukId],
+        [],
+      ),
     'addPhoto' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [PhotoId], []),
+    'addProdukAnggota' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [ProdukId],
+        [],
+      ),
+    'approvePengajuanProduk' : IDL.Func([PengajuanProdukId], [ProdukId], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'deleteEdukasi' : IDL.Func([EdukasiId], [], []),
+    'deleteProdukAnggota' : IDL.Func([ProdukId], [], []),
+    'editEdukasi' : IDL.Func(
+        [EdukasiId, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [],
+        [],
+      ),
+    'editProdukAnggota' : IDL.Func(
+        [ProdukId, IDL.Opt(IDL.Text), IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [],
+        [],
+      ),
     'endAdminSession' : IDL.Func([AdminSessionId], [], []),
     'getAllArticles' : IDL.Func([], [IDL.Vec(Article)], ['query']),
+    'getAllEdukasi' : IDL.Func([], [IDL.Vec(Edukasi)], ['query']),
     'getAllMemberProfiles' : IDL.Func([], [IDL.Vec(MemberProfile)], ['query']),
+    'getAllPengajuanProduk' : IDL.Func(
+        [],
+        [IDL.Vec(PengajuanProduk)],
+        ['query'],
+      ),
     'getAllPhotos' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
+    'getAllProdukAnggota' : IDL.Func([], [IDL.Vec(ProdukAnggota)], ['query']),
+    'getAnggotaListByCategorySorted' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(MemberProfile)],
+        ['query'],
+      ),
     'getArticlesByDate' : IDL.Func([], [IDL.Vec(Article)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getEdukasiByDate' : IDL.Func([], [IDL.Vec(Edukasi)], ['query']),
     'getEventsByDate' : IDL.Func([], [IDL.Vec(Event)], ['query']),
     'getEventsByLocation' : IDL.Func([IDL.Text], [IDL.Vec(Event)], ['query']),
     'getMemberProfilesByBusinessName' : IDL.Func(
@@ -289,9 +457,41 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(MemberProfile)],
         ['query'],
       ),
+    'getMembersForAdmin' : IDL.Func([], [IDL.Vec(MemberProfile)], ['query']),
     'getPastEvents' : IDL.Func([], [IDL.Vec(Event)], ['query']),
+    'getPengajuanByKategori' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(PengajuanProduk)],
+        ['query'],
+      ),
+    'getPengajuanByKategoriSorted' : IDL.Func(
+        [],
+        [IDL.Vec(PengajuanProduk)],
+        ['query'],
+      ),
+    'getPengajuanByNamaUsahaSorted' : IDL.Func(
+        [],
+        [IDL.Vec(PengajuanProduk)],
+        ['query'],
+      ),
     'getPhotosByCategory' : IDL.Func([IDL.Text], [IDL.Vec(Photo)], ['query']),
     'getPhotosByUploadDate' : IDL.Func([], [IDL.Vec(Photo)], ['query']),
+    'getProdukByKategori' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(ProdukAnggota)],
+        ['query'],
+      ),
+    'getProdukByKategoriSorted' : IDL.Func(
+        [],
+        [IDL.Vec(ProdukAnggota)],
+        ['query'],
+      ),
+    'getProdukByNamaUsahaSorted' : IDL.Func(
+        [],
+        [IDL.Vec(ProdukAnggota)],
+        ['query'],
+      ),
+    'getSortedAnggotaList' : IDL.Func([], [IDL.Vec(MemberProfile)], ['query']),
     'getUpcomingEvents' : IDL.Func([], [IDL.Vec(Event)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -313,14 +513,18 @@ export const idlFactory = ({ IDL }) => {
         [MemberId],
         [],
       ),
+    'rejectPengajuanProduk' : IDL.Func([PengajuanProdukId], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'searchAnggota' : IDL.Func([IDL.Text], [IDL.Vec(MemberProfile)], ['query']),
     'searchMemberProfilesByBusinessName' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(MemberProfile)],
         ['query'],
       ),
-    'startAdminSession' : IDL.Func([], [AdminSessionId], []),
+    'startAdminSession' : IDL.Func([IDL.Text, IDL.Text], [AdminSessionId], []),
+    'updateMemberIdNumber' : IDL.Func([MemberId, IDL.Text], [], []),
     'validateAdminSession' : IDL.Func([AdminSessionId], [IDL.Bool], ['query']),
+    'verifyMember' : IDL.Func([MemberId, IDL.Bool], [], []),
   });
 };
 

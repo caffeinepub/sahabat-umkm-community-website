@@ -1,5 +1,5 @@
-import { SiFacebook, SiInstagram, SiX, SiYoutube } from 'react-icons/si';
-import { Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
+import { SiFacebook, SiInstagram, SiX, SiLinkedin } from 'react-icons/si';
 
 interface FooterProps {
   onNavigate: (section: string) => void;
@@ -13,67 +13,63 @@ export default function Footer({ onNavigate }: FooterProps) {
           {/* Logo & Description */}
           <div className="col-span-1 md:col-span-2">
             <img
-              src="/assets/logo su putih.png"
-              alt="Sahabat UMKM"
-              className="h-16 w-auto mb-4"
+              src="/assets/logo flat SU BPC Karawang png.png"
+              alt="Sahabat UMKM BPC Karawang"
+              className="h-16 md:h-20 w-auto mb-4 object-contain"
             />
             <p className="text-muted-foreground mb-4">
-              Komunitas yang berdedikasi untuk mendukung dan mengembangkan usaha mikro, kecil, dan menengah di Indonesia.
+              Bersama membangun dan mengembangkan UMKM Indonesia menuju masa depan yang lebih cerah.
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#"
                 className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                aria-label="Facebook"
               >
-                <SiFacebook className="h-6 w-6" />
+                <SiFacebook className="h-5 w-5" />
               </a>
               <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-umkm-orange transition-colors"
-              >
-                <SiInstagram className="h-6 w-6" />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#"
                 className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                aria-label="Instagram"
               >
-                <SiX className="h-6 w-6" />
+                <SiInstagram className="h-5 w-5" />
               </a>
               <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-umkm-red transition-colors"
+                href="#"
+                className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                aria-label="X (Twitter)"
               >
-                <SiYoutube className="h-6 w-6" />
+                <SiX className="h-5 w-5" />
+              </a>
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                aria-label="LinkedIn"
+              >
+                <SiLinkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Tautan Cepat</h3>
+            <h3 className="font-semibold text-foreground mb-4">Navigasi Cepat</h3>
             <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => onNavigate('home')}
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                >
+                  Beranda
+                </button>
+              </li>
               <li>
                 <button
                   onClick={() => onNavigate('about')}
                   className="text-muted-foreground hover:text-umkm-blue transition-colors"
                 >
                   Tentang Kami
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('events')}
-                  className="text-muted-foreground hover:text-umkm-blue transition-colors"
-                >
-                  Acara
                 </button>
               </li>
               <li>
@@ -86,10 +82,42 @@ export default function Footer({ onNavigate }: FooterProps) {
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('members')}
+                  onClick={() => onNavigate('gallery')}
                   className="text-muted-foreground hover:text-umkm-blue transition-colors"
                 >
-                  Direktori Anggota
+                  Galeri
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('education')}
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                >
+                  Edukasi
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('products')}
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                >
+                  Produk Anggota
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('anggota')}
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                >
+                  Anggota
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('product-submission')}
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors"
+                >
+                  Kirim Produk UMKM
                 </button>
               </li>
               <li>
@@ -107,33 +135,37 @@ export default function Footer({ onNavigate }: FooterProps) {
           <div>
             <h3 className="font-semibold text-foreground mb-4">Kontak</h3>
             <ul className="space-y-3">
-              <li className="flex items-start">
-                <MapPin className="h-5 w-5 mr-2 text-umkm-orange flex-shrink-0 mt-0.5" />
+              <li className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-umkm-blue mt-0.5 flex-shrink-0" />
                 <span className="text-muted-foreground text-sm">
-                  BPC Karawang, Jawa Barat, Indonesia
+                  Karawang, Jawa Barat, Indonesia
                 </span>
               </li>
-              <li className="flex items-center">
-                <Mail className="h-5 w-5 mr-2 text-umkm-orange flex-shrink-0" />
+              <li className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-umkm-blue flex-shrink-0" />
                 <a
                   href="mailto:info@sahabatumkm.id"
-                  className="text-muted-foreground text-sm hover:text-umkm-blue transition-colors"
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors text-sm"
                 >
                   info@sahabatumkm.id
                 </a>
               </li>
-              <li className="flex items-center">
-                <Phone className="h-5 w-5 mr-2 text-umkm-orange flex-shrink-0" />
-                <span className="text-muted-foreground text-sm">+62 xxx xxxx xxxx</span>
+              <li className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-umkm-blue flex-shrink-0" />
+                <a
+                  href="tel:+62123456789"
+                  className="text-muted-foreground hover:text-umkm-blue transition-colors text-sm"
+                >
+                  +62 123 456 789
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
           <p>
-            © 2025. Built with <Heart className="inline h-4 w-4 text-umkm-red" /> using{' '}
+            © 2025. Built with ❤️ using{' '}
             <a
               href="https://caffeine.ai"
               target="_blank"

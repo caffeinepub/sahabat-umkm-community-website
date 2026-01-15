@@ -19,6 +19,15 @@ export interface Article {
   'author' : string,
 }
 export type ArticleId = bigint;
+export interface Edukasi {
+  'id' : EdukasiId,
+  'title' : string,
+  'content' : string,
+  'date' : bigint,
+  'author' : string,
+  'image' : [] | [string],
+}
+export type EdukasiId = bigint;
 export interface Event {
   'id' : EventId,
   'title' : string,
@@ -29,6 +38,7 @@ export interface Event {
 }
 export type EventId = bigint;
 export type MemberId = bigint;
+export type MemberIdNumber = string;
 export interface MemberProfile {
   'id' : MemberId,
   'verified' : boolean,
@@ -41,7 +51,16 @@ export interface MemberProfile {
   'address' : string,
   'category' : string,
   'products' : Array<string>,
+  'memberIdNumber' : [] | [MemberIdNumber],
 }
+export interface PengajuanProduk {
+  'id' : PengajuanProdukId,
+  'namaUsaha' : string,
+  'foto' : [] | [string],
+  'kategori' : string,
+  'hubungiSelanjutnya' : [] | [string],
+}
+export type PengajuanProdukId = bigint;
 export interface Photo {
   'id' : PhotoId,
   'url' : string,
@@ -50,6 +69,14 @@ export interface Photo {
   'uploadDate' : bigint,
 }
 export type PhotoId = bigint;
+export interface ProdukAnggota {
+  'id' : ProdukId,
+  'namaUsaha' : string,
+  'foto' : [] | [string],
+  'kategori' : string,
+  'hubungiSelanjutnya' : [] | [string],
+}
+export type ProdukId = bigint;
 export interface UserProfile {
   'name' : string,
   'email' : [] | [string],
@@ -87,24 +114,63 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addArticle' : ActorMethod<[string, string, string], ArticleId>,
+  'addEdukasi' : ActorMethod<
+    [string, string, string, [] | [string]],
+    EdukasiId
+  >,
   'addEvent' : ActorMethod<[string, string, string, bigint, boolean], EventId>,
+  'addPengajuanProduk' : ActorMethod<
+    [[] | [string], string, string, [] | [string]],
+    PengajuanProdukId
+  >,
   'addPhoto' : ActorMethod<[string, string, string], PhotoId>,
+  'addProdukAnggota' : ActorMethod<
+    [[] | [string], string, string, [] | [string]],
+    ProdukId
+  >,
+  'approvePengajuanProduk' : ActorMethod<[PengajuanProdukId], ProdukId>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'deleteEdukasi' : ActorMethod<[EdukasiId], undefined>,
+  'deleteProdukAnggota' : ActorMethod<[ProdukId], undefined>,
+  'editEdukasi' : ActorMethod<
+    [EdukasiId, string, string, string, [] | [string]],
+    undefined
+  >,
+  'editProdukAnggota' : ActorMethod<
+    [ProdukId, [] | [string], string, string, [] | [string]],
+    undefined
+  >,
   'endAdminSession' : ActorMethod<[AdminSessionId], undefined>,
   'getAllArticles' : ActorMethod<[], Array<Article>>,
+  'getAllEdukasi' : ActorMethod<[], Array<Edukasi>>,
   'getAllMemberProfiles' : ActorMethod<[], Array<MemberProfile>>,
+  'getAllPengajuanProduk' : ActorMethod<[], Array<PengajuanProduk>>,
   'getAllPhotos' : ActorMethod<[], Array<Photo>>,
+  'getAllProdukAnggota' : ActorMethod<[], Array<ProdukAnggota>>,
+  'getAnggotaListByCategorySorted' : ActorMethod<
+    [string],
+    Array<MemberProfile>
+  >,
   'getArticlesByDate' : ActorMethod<[], Array<Article>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getEdukasiByDate' : ActorMethod<[], Array<Edukasi>>,
   'getEventsByDate' : ActorMethod<[], Array<Event>>,
   'getEventsByLocation' : ActorMethod<[string], Array<Event>>,
   'getMemberProfilesByBusinessName' : ActorMethod<[], Array<MemberProfile>>,
   'getMemberProfilesByCategory' : ActorMethod<[string], Array<MemberProfile>>,
   'getMemberProfilesByCategorySorted' : ActorMethod<[], Array<MemberProfile>>,
+  'getMembersForAdmin' : ActorMethod<[], Array<MemberProfile>>,
   'getPastEvents' : ActorMethod<[], Array<Event>>,
+  'getPengajuanByKategori' : ActorMethod<[string], Array<PengajuanProduk>>,
+  'getPengajuanByKategoriSorted' : ActorMethod<[], Array<PengajuanProduk>>,
+  'getPengajuanByNamaUsahaSorted' : ActorMethod<[], Array<PengajuanProduk>>,
   'getPhotosByCategory' : ActorMethod<[string], Array<Photo>>,
   'getPhotosByUploadDate' : ActorMethod<[], Array<Photo>>,
+  'getProdukByKategori' : ActorMethod<[string], Array<ProdukAnggota>>,
+  'getProdukByKategoriSorted' : ActorMethod<[], Array<ProdukAnggota>>,
+  'getProdukByNamaUsahaSorted' : ActorMethod<[], Array<ProdukAnggota>>,
+  'getSortedAnggotaList' : ActorMethod<[], Array<MemberProfile>>,
   'getUpcomingEvents' : ActorMethod<[], Array<Event>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
@@ -121,13 +187,17 @@ export interface _SERVICE {
     ],
     MemberId
   >,
+  'rejectPengajuanProduk' : ActorMethod<[PengajuanProdukId], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'searchAnggota' : ActorMethod<[string], Array<MemberProfile>>,
   'searchMemberProfilesByBusinessName' : ActorMethod<
     [string],
     Array<MemberProfile>
   >,
-  'startAdminSession' : ActorMethod<[], AdminSessionId>,
+  'startAdminSession' : ActorMethod<[string, string], AdminSessionId>,
+  'updateMemberIdNumber' : ActorMethod<[MemberId, string], undefined>,
   'validateAdminSession' : ActorMethod<[AdminSessionId], boolean>,
+  'verifyMember' : ActorMethod<[MemberId, boolean], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

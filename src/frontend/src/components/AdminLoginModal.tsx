@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useStartAdminSession } from '../hooks/useQueries';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { useActor } from '../hooks/useActor';
+import { AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -15,13 +16,37 @@ interface AdminLoginModalProps {
 
 export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProps) {
   const { identity, login, loginStatus } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
   const startAdminSession = useStartAdminSession();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string>('');
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === 'logging-in';
+  const isActorReady = !!actor && !actorFetching;
 
-  const handleAdminLogin = async () => {
+  // Clear error and form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setError('');
+      setIsRetrying(false);
+      setUsername('');
+      setPassword('');
+    }
+  }, [isOpen]);
+
+  // Check if actor becomes available after initial load
+  useEffect(() => {
+    if (isActorReady && isRetrying) {
+      setIsRetrying(false);
+      setError('');
+    }
+  }, [isActorReady, isRetrying]);
+
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
     
     if (!isAuthenticated) {
@@ -29,16 +54,49 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
       return;
     }
 
+    if (!username || !password) {
+      setError('Mohon masukkan username dan password.');
+      return;
+    }
+
+    if (!isActorReady) {
+      setError('Koneksi ke backend sedang diinisialisasi. Silakan tunggu sebentar dan coba lagi.');
+      setIsRetrying(true);
+      return;
+    }
+
     try {
-      await startAdminSession.mutateAsync();
+      await startAdminSession.mutateAsync({ username, password });
+      // Clear form and close modal on success
+      setUsername('');
+      setPassword('');
       onClose();
     } catch (err: any) {
       console.error('Admin login error:', err);
-      if (err.message?.includes('Unauthorized')) {
-        setError('Akses ditolak. Anda tidak memiliki izin admin.');
-      } else {
-        setError('Terjadi kesalahan saat masuk sebagai admin. Silakan coba lagi.');
+      
+      // Extract and translate error messages
+      let errorMessage = 'Terjadi kesalahan saat masuk sebagai admin. Silakan coba lagi.';
+      
+      if (err.message) {
+        if (err.message.includes('Invalid credentials')) {
+          errorMessage = 'Login gagal. Periksa username dan password.';
+        } else if (err.message.includes('Unauthorized')) {
+          errorMessage = 'Login gagal. Username atau password salah.';
+        } else if (err.message.includes('Actor not available')) {
+          errorMessage = 'Koneksi ke backend gagal. Silakan muat ulang halaman.';
+          setIsRetrying(true);
+        } else if (err.message.includes('Failed to start admin session after retries')) {
+          errorMessage = 'Koneksi ke backend gagal setelah beberapa percobaan. Silakan periksa koneksi internet Anda dan coba lagi.';
+        } else if (err.message.includes('network') || err.message.includes('timeout')) {
+          errorMessage = 'Koneksi jaringan bermasalah. Silakan periksa koneksi internet Anda.';
+          setIsRetrying(true);
+        } else {
+          // Show the actual backend error message
+          errorMessage = err.message;
+        }
       }
+      
+      setError(errorMessage);
     }
   };
 
@@ -50,6 +108,12 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
       console.error('Internet Identity login error:', err);
       setError('Gagal masuk dengan Internet Identity. Silakan coba lagi.');
     }
+  };
+
+  const handleRetry = () => {
+    setError('');
+    setIsRetrying(false);
+    // The actor will automatically retry initialization
   };
 
   return (
@@ -67,6 +131,16 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Backend connection status */}
+          {actorFetching && (
+            <Alert>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <AlertDescription>
+                Menghubungkan ke backend...
+              </AlertDescription>
             </Alert>
           )}
 
@@ -91,31 +165,74 @@ export default function AdminLoginModal({ isOpen, onClose }: AdminLoginModalProp
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="rounded-lg bg-muted p-4">
                 <p className="text-sm text-muted-foreground mb-2">
-                  Anda sudah masuk. Klik tombol di bawah untuk mengaktifkan sesi admin.
+                  Anda sudah masuk. Masukkan kredensial admin untuk mengaktifkan sesi admin.
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Hanya pengguna dengan izin admin yang dapat mengakses panel ini.
                 </p>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Masukkan username"
+                  disabled={startAdminSession.isPending || actorFetching}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Masukkan password"
+                  disabled={startAdminSession.isPending || actorFetching}
+                  required
+                />
+              </div>
+
+              {isRetrying && (
+                <Button
+                  type="button"
+                  onClick={handleRetry}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Coba Lagi Koneksi
+                </Button>
+              )}
+
               <Button
-                onClick={handleAdminLogin}
-                disabled={startAdminSession.isPending}
+                type="submit"
                 className="w-full bg-umkm-blue hover:bg-umkm-blue/90"
+                disabled={startAdminSession.isPending || actorFetching || !isActorReady}
               >
                 {startAdminSession.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Memverifikasi...
                   </>
+                ) : actorFetching ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menghubungkan...
+                  </>
                 ) : (
                   'Aktifkan Sesi Admin'
                 )}
               </Button>
-            </div>
+            </form>
           )}
 
           <div className="pt-4 border-t">
