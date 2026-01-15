@@ -88,6 +88,17 @@ A community website for UMKM (Usaha Mikro, Kecil, dan Menengah) members featurin
 - Training resources and guides
 - Learning materials organized by topics
 - Styled with soft blue background theme consistent with site design
+- **Full-view PDF Modal**: When users click on published educational materials, display PDF files in a full-screen modal
+- **Modal Features**:
+  - Full-screen overlay that covers the entire viewport
+  - PDF viewer embedded within the modal for direct viewing
+  - Scrollable content (up/down) to navigate through PDF pages
+  - "Close" button positioned in the top-right corner of the modal
+  - Modal closes when Close button is clicked or when clicking outside the PDF area
+  - Responsive design that adapts to both desktop and mobile devices
+  - Modal background styled with soft blue theme consistent with website design
+  - PDF viewer maintains readability and proper scaling across different screen sizes
+  - Smooth modal open/close animations for better user experience
 
 ### Produk Anggota (Member Products)
 - Display of member products and businesses

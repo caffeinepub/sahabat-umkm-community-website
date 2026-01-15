@@ -1,4 +1,4 @@
-import { Calendar, User, ArrowRight, GraduationCap, Plus, Edit, Trash2, Loader2, ArrowLeft, FileText } from 'lucide-react';
+import { Calendar, User, ArrowRight, GraduationCap, Plus, Edit, Trash2, Loader2, ArrowLeft, FileText, X } from 'lucide-react';
 import { useGetAllEdukasi, useAddEdukasi, useEditEdukasi, useDeleteEdukasi } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,8 @@ export default function EducationManagement({ category, onBack }: EducationManag
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [editingEdukasi, setEditingEdukasi] = useState<Edukasi | null>(null);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string>('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -204,6 +206,20 @@ export default function EducationManagement({ category, onBack }: EducationManag
     }
   };
 
+  const handleOpenPdfModal = (url: string) => {
+    setPdfUrl(url);
+    setShowPdfModal(true);
+  };
+
+  const handleClosePdfModal = () => {
+    setShowPdfModal(false);
+    setPdfUrl('');
+  };
+
+  const isPdfContent = (edukasi: Edukasi) => {
+    return edukasi.image && edukasi.image.startsWith('data:application/pdf');
+  };
+
   const getCategoryLabel = () => {
     if (category === 'all') return 'Semua Kategori';
     return category;
@@ -296,14 +312,14 @@ export default function EducationManagement({ category, onBack }: EducationManag
                         </span>
                       </div>
                       {edukasi.image && (
-                        <a
-                          href={edukasi.image}
-                          download={`${titleWithoutCategory}.pdf`}
-                          className="inline-flex items-center text-umkm-blue hover:text-umkm-blue/80 text-sm font-medium"
+                        <Button
+                          variant="link"
+                          onClick={() => handleOpenPdfModal(edukasi.image!)}
+                          className="inline-flex items-center text-umkm-blue hover:text-umkm-blue/80 text-sm font-medium p-0 h-auto"
                         >
                           <FileText className="h-4 w-4 mr-1" />
-                          Download Materi PDF
-                        </a>
+                          Lihat Materi PDF
+                        </Button>
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -341,7 +357,7 @@ export default function EducationManagement({ category, onBack }: EducationManag
               const titleWithoutCategory = edukasi.title.replace(/\[.*?\]\s*/, '');
               return (
                 <Card key={Number(edukasi.id)} className="hover:shadow-lg transition-shadow flex flex-col">
-                  {edukasi.image && (
+                  {edukasi.image && !isPdfContent(edukasi) && (
                     <div className="w-full h-48 overflow-hidden rounded-t-lg">
                       <img
                         src={edukasi.image}
@@ -428,7 +444,7 @@ export default function EducationManagement({ category, onBack }: EducationManag
                     </span>
                   </div>
                 </DialogHeader>
-                {selectedEdukasi.image && (
+                {selectedEdukasi.image && !isPdfContent(selectedEdukasi) && (
                   <div className="w-full h-64 overflow-hidden rounded-lg mt-4">
                     <img
                       src={selectedEdukasi.image}
@@ -578,6 +594,37 @@ export default function EducationManagement({ category, onBack }: EducationManag
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Full-Screen PDF Modal */}
+        {showPdfModal && (
+          <div
+            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col"
+            onClick={handleClosePdfModal}
+          >
+            <div className="flex items-center justify-end p-4">
+              <Button
+                onClick={handleClosePdfModal}
+                variant="ghost"
+                size="icon"
+                className="text-foreground hover:bg-accent rounded-full"
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+            <div
+              className="flex-1 overflow-auto px-4 pb-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="max-w-5xl mx-auto h-full">
+                <iframe
+                  src={pdfUrl}
+                  className="w-full h-full min-h-[80vh] rounded-lg border border-border bg-card"
+                  title="PDF Viewer"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

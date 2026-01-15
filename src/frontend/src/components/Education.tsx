@@ -1,4 +1,4 @@
-import { Calendar, User, ArrowRight, GraduationCap, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Calendar, User, ArrowRight, GraduationCap, Plus, Edit, Trash2, Loader2, X } from 'lucide-react';
 import { useGetAllEdukasi, useAddEdukasi, useEditEdukasi, useDeleteEdukasi, useCheckAdminStatus } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,8 @@ export default function Education() {
   const [selectedEdukasi, setSelectedEdukasi] = useState<Edukasi | null>(null);
   const [showManageDialog, setShowManageDialog] = useState(false);
   const [editingEdukasi, setEditingEdukasi] = useState<Edukasi | null>(null);
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string>('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -119,6 +121,20 @@ export default function Education() {
     }
   };
 
+  const handleOpenPdfModal = (url: string) => {
+    setPdfUrl(url);
+    setShowPdfModal(true);
+  };
+
+  const handleClosePdfModal = () => {
+    setShowPdfModal(false);
+    setPdfUrl('');
+  };
+
+  const isPdfContent = (edukasi: Edukasi) => {
+    return edukasi.image && edukasi.image.startsWith('data:application/pdf');
+  };
+
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -162,7 +178,7 @@ export default function Education() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {edukasiList.map((edukasi) => (
               <Card key={Number(edukasi.id)} className="hover:shadow-lg transition-shadow flex flex-col">
-                {edukasi.image && (
+                {edukasi.image && !isPdfContent(edukasi) && (
                   <div className="w-full h-48 overflow-hidden rounded-t-lg">
                     <img
                       src={edukasi.image}
@@ -190,15 +206,27 @@ export default function Education() {
                       {edukasi.author}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedEdukasi(edukasi)}
-                        className="text-umkm-blue hover:text-umkm-blue/80"
-                      >
-                        Baca
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
+                      {isPdfContent(edukasi) ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenPdfModal(edukasi.image!)}
+                          className="text-umkm-blue hover:text-umkm-blue/80"
+                        >
+                          Lihat
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedEdukasi(edukasi)}
+                          className="text-umkm-blue hover:text-umkm-blue/80"
+                        >
+                          Baca
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      )}
                       {isAdmin && (
                         <>
                           <Button
@@ -250,7 +278,7 @@ export default function Education() {
                     </span>
                   </div>
                 </DialogHeader>
-                {selectedEdukasi.image && (
+                {selectedEdukasi.image && !isPdfContent(selectedEdukasi) && (
                   <div className="w-full h-64 overflow-hidden rounded-lg mt-4">
                     <img
                       src={selectedEdukasi.image}
@@ -340,6 +368,37 @@ export default function Education() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Full-Screen PDF Modal */}
+        {showPdfModal && (
+          <div
+            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col"
+            onClick={handleClosePdfModal}
+          >
+            <div className="flex items-center justify-end p-4">
+              <Button
+                onClick={handleClosePdfModal}
+                variant="ghost"
+                size="icon"
+                className="text-foreground hover:bg-accent rounded-full"
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+            <div
+              className="flex-1 overflow-auto px-4 pb-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="max-w-5xl mx-auto h-full">
+                <iframe
+                  src={pdfUrl}
+                  className="w-full h-full min-h-[80vh] rounded-lg border border-border bg-card"
+                  title="PDF Viewer"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
